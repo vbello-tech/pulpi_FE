@@ -1,0 +1,119 @@
+:root {
+  /* Color: a preacher's study — paper, ink, brass, oxblood */
+  --paper: #ECE8DC;
+  --paper-raised: #F7F4EA;
+  --ink: #1B2430;
+  --ink-soft: #4A5261;
+  --rule: #D8D2BF;
+  --oxblood: #7C2D3B;
+  --oxblood-soft: #F3E4E6;
+  --brass: #A9832E;
+  --brass-soft: #F1E7CC;
+  --sage: #5B7553;
+
+  /* Type: serif for headings/manuscript voice, sans for UI chrome */
+  --font-serif: "Iowan Old Style", "Palatino Linotype", "URW Palladio L", Georgia, serif;
+  --font-sans: -apple-system, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+
+  --radius: 3px;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #app {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 0.4em;
+}
+
+a { color: var(--oxblood); }
+
+button {
+  font-family: var(--font-sans);
+  cursor: pointer;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.55em 1.1em;
+  border-radius: var(--radius);
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper-raised);
+  font-size: 0.9rem;
+  transition: transform 0.08s ease, opacity 0.15s ease;
+}
+.btn:hover { opacity: 0.88; }
+.btn:active { transform: translateY(1px); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--rule);
+}
+.btn-outline:hover { border-color: var(--ink); opacity: 1; }
+
+.btn-quiet {
+  background: transparent;
+  color: var(--ink-soft);
+  border: none;
+  padding: 0.3em 0.5em;
+}
+.btn-quiet:hover { color: var(--ink); }
+
+.btn-danger { border-color: var(--oxblood); color: var(--oxblood); background: transparent; }
+
+input, textarea, select {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  padding: 0.55em 0.7em;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+  color: var(--ink);
+  width: 100%;
+}
+input:focus, textarea:focus, select:focus {
+  outline: 2px solid var(--brass);
+  outline-offset: 1px;
+  border-color: var(--brass);
+}
+
+label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  margin-bottom: 0.3em;
+}
+
+.field { margin-bottom: 1rem; }
+
+.card {
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.error-text {
+  color: var(--oxblood);
+  font-size: 0.85rem;
+  margin-top: 0.4em;
+}
+
+::selection { background: var(--brass-soft); }
