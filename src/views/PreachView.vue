@@ -27,7 +27,8 @@
         <p v-else class="empty">This sermon doesn't have an outline yet.</p>
       </article>
 
-      <div class="sidebar">
+      <div class="sidebar" :class="{ 'sidebar-open': showBible }">
+        <button class="sidebar-close" aria-label="Close Bible panel" @click="showBible = false">×</button>
         <MiniBible
           ref="miniBible"
           :replace-target="activeVerseRef"
@@ -36,6 +37,10 @@
         />
       </div>
     </div>
+
+    <button class="bible-fab" @click="showBible = true">
+      <span aria-hidden="true">📖</span> Bible
+    </button>
   </div>
 </template>
 
@@ -50,6 +55,7 @@ const props = defineProps({ id: { type: [String, Number], required: true } });
 const sermon = ref(null);
 const activeVerseRef = ref(null);
 const miniBible = ref(null);
+const showBible = ref(false);
 
 async function reload() {
   sermon.value = await sermonsApi.get(props.id);
@@ -57,6 +63,7 @@ async function reload() {
 
 function onClickVerse(vr) {
   activeVerseRef.value = vr;
+  showBible.value = true;
   const d = vr.verse_detail;
   if (d) miniBible.value?.showVerse({ book: d.book_name, chapter: d.chapter, verse: d.verse });
 }
@@ -154,12 +161,65 @@ onMounted(reload);
 .sidebar {
   min-height: 0;
 }
+.sidebar-close {
+  display: none;
+}
+.bible-fab {
+  display: none;
+}
 
 @media (max-width: 900px) {
   .preach-layout {
     grid-template-columns: 1fr;
   }
   .manuscript { padding: 1.6rem 1.4rem; }
-  .sidebar { height: 420px; }
+
+  .sidebar {
+    display: none;
+  }
+  .sidebar.sidebar-open {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: var(--paper);
+    padding: 1rem;
+    padding-top: 3.4rem;
+  }
+  .sidebar-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0.9rem;
+    right: 1rem;
+    width: 2.3rem;
+    height: 2.3rem;
+    border-radius: 50%;
+    border: 1px solid var(--rule);
+    background: var(--paper-raised);
+    color: var(--ink);
+    font-size: 1.4rem;
+    line-height: 1;
+    z-index: 41;
+  }
+  .bible-fab {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    position: fixed;
+    bottom: 1.3rem;
+    right: 1.2rem;
+    padding: 0.7em 1.2em;
+    border-radius: 999px;
+    background: var(--oxblood);
+    color: var(--paper-raised);
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(27, 36, 48, 0.25);
+    z-index: 35;
+  }
 }
 </style>
