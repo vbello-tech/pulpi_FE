@@ -2,15 +2,25 @@
   <aside class="mini-bible card">
     <div class="mb-head">
       <h2>Bible</h2>
-      <select v-model="translation" @change="load">
-        <option v-for="t in translations" :key="t.code" :value="t.code">{{ t.name }}</option>
-      </select>
+    </div>
+
+    <div class="field version-field">
+      <label>Version</label>
+      <CustomSelect
+        v-model="translation"
+        :options="translationOptions"
+        placeholder="Choose a version"
+        @change="load"
+      />
     </div>
 
     <div class="mb-controls">
-      <select v-model="bookName" @change="onBookChange">
-        <option v-for="b in books" :key="b.id" :value="b.name">{{ b.name }}</option>
-      </select>
+      <CustomSelect
+        v-model="bookName"
+        :options="bookOptions"
+        placeholder="Choose a book"
+        @change="onBookChange"
+      />
       <div class="mb-row">
         <input v-model.number="chapter" type="number" min="1" placeholder="Ch" @keyup.enter="load" />
         <input v-model.number="verseStart" type="number" min="1" placeholder="Start v" @keyup.enter="load" />
@@ -24,6 +34,11 @@
     <div v-if="replaceTarget" class="replace-banner">
       <span>Pick a verse for <strong>{{ replaceTarget.verse_detail?.reference }}</strong></span>
       <button class="btn-quiet" @click="$emit('cancel-replace')">Cancel</button>
+    </div>
+
+    <div v-if="verses.length && !loading" class="reading-head">
+      <span class="reading-ref">{{ bookName }} {{ chapter }}</span>
+      <span class="reading-version">{{ currentTranslationName }}</span>
     </div>
 
     <div class="mb-results">
@@ -46,8 +61,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { bibleApi } from "../api/sermons";
+import CustomSelect from "./CustomSelect.vue";
 
 defineProps({
   replaceTarget: { type: Object, default: null },
@@ -63,6 +79,15 @@ const verseEnd = ref(null);
 const translation = ref("KJV");
 const verses = ref([]);
 const loading = ref(false);
+
+const currentTranslationName = computed(() => {
+  return translations.value.find((t) => t.code === translation.value)?.name || translation.value;
+});
+
+const bookOptions = computed(() => books.value.map((b) => ({ value: b.name, label: b.name })));
+const translationOptions = computed(() =>
+  translations.value.map((t) => ({ value: t.code, label: t.name }))
+);
 
 function isHighlighted(v) {
   if (!verseStart.value) return false;
@@ -104,6 +129,9 @@ defineExpose({ showVerse });
 
 onMounted(async () => {
   [books.value, translations.value] = await Promise.all([bibleApi.books(), bibleApi.translations()]);
+  if (translations.value.length && !translations.value.some((t) => t.code === translation.value)) {
+    translation.value = translations.value[0].code;
+  }
   if (books.value.length) {
     bookName.value = books.value[0].name;
     await load();
@@ -123,16 +151,22 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.7rem;
 }
 .mb-head h2 {
   font-size: 1.1rem;
   margin: 0;
 }
-.mb-head select {
-  width: auto;
-  font-size: 0.78rem;
-  padding: 0.3em 0.5em;
+.version-field {
+  margin-bottom: 0.9rem;
+}
+.version-field label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--brass);
+  font-weight: 600;
+  margin-bottom: 0.3em;
 }
 .mb-controls {
   display: flex;
@@ -158,6 +192,27 @@ onMounted(async () => {
   padding: 0.5em 0.7em;
   border-radius: var(--radius);
   margin-bottom: 0.7rem;
+}
+.reading-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.reading-ref {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+.reading-version {
+  font-size: 0.72rem;
+  color: var(--oxblood);
+  background: var(--oxblood-soft);
+  padding: 0.15em 0.6em;
+  border-radius: 999px;
+  white-space: nowrap;
 }
 .mb-results {
   overflow-y: auto;
@@ -201,3 +256,5 @@ onMounted(async () => {
   flex-shrink: 0;
 }
 </style>
+
+
